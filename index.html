@@ -4,26 +4,74 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For Anshu Didi ❤️</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Poppins:wght@300;400;600&family=Sacramento&display=swap" rel="stylesheet">
     
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCTJrlLbzSRPpsOt2JFP40pieuuHkzzd0s",
+            authDomain: "smritikismritime.firebaseapp.com",
+            projectId: "smritikismritime",
+            storageBucket: "smritikismritime.firebasestorage.app",
+            messagingSenderId: "464815274632",
+            appId: "1:464815274632:web:d1cf13efc758bfe2ba3d3d"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        window.submitToFirebase = async function() {
+            const answers = {};
+            
+            // Collect Form Data
+            const formData = new FormData(document.getElementById('quizForm'));
+            for (let [key, value] of formData.entries()) {
+                answers[key] = value;
+            }
+
+            // Get the specific final question from Page 4
+            const finalQ = document.getElementById('finalQuestion').value;
+            answers['like_hate_brother'] = finalQ;
+            answers['timestamp'] = serverTimestamp();
+
+            try {
+                const btn = document.getElementById('finalSubmitBtn');
+                btn.innerText = "Sending Love...";
+                await addDoc(collection(db, "anshu_didi_answers"), answers);
+                btn.innerText = "Sent! ❤️";
+                alert("Your answers have reached Akrit!");
+                
+                // Reveal the heart section
+                document.getElementById('final-message-container').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('page4-part2').style.display = 'block';
+                
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                alert("Error sending answers. Check internet connection.");
+            }
+        }
+    </script>
+
     <style>
-        /* --- VISUAL STYLES (Pink, Warm, Beautiful) --- */
         :root {
-            --primary: #ff4d6d;
-            --secondary: #ffb7b2;
-            --text: #4a4a4a;
-            --white: #ffffff;
+            --primary: #c21e56; /* Deep Reddish Pink */
+            --gold: #d4af37;
+            --cream: #fff5f5;
+            --text: #4a2c2c;
         }
 
         body {
             margin: 0;
             padding: 0;
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            background: linear-gradient(135deg, #fff0f5 0%, #ffe4e1 100%);
             color: var(--text);
             overflow-x: hidden;
-            scroll-behavior: smooth;
         }
 
         h1, h2, h3 {
@@ -31,421 +79,515 @@
             color: var(--primary);
         }
 
-        button {
-            cursor: pointer;
-            transition: all 0.3s ease;
+        p {
+            font-family: 'Lora', serif;
+            line-height: 1.6;
         }
 
-        /* --- SECTIONS --- */
-        .section {
+        /* --- Animations --- */
+        .fade-in-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+        }
+        .fade-in-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- Page Sections --- */
+        section {
             min-height: 100vh;
-            display: none; /* Hidden by default, JS turns them on */
+            padding: 20px;
+            display: none; /* Hidden by default */
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+
+        section.active {
+            display: flex;
+            animation: fadeInPage 1s ease;
+        }
+
+        @keyframes fadeInPage {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* --- Page 1: Home --- */
+        #page1 {
             justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-            animation: fadeIn 1s ease-in;
+            background-image: url('https://www.transparenttextures.com/patterns/hearts.png');
         }
 
-        /* Page 1 Specifics */
-        #page1 { display: flex; background: linear-gradient(to top, #fad0c4 0%, #ffd1ff 100%); }
-        
-        .landing-box {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            border: 2px solid var(--primary);
-            max-width: 90%;
-        }
-
-        .heart-icon { font-size: 80px; animation: heartbeat 1.5s infinite; }
-
-        .btn-main {
-            padding: 15px 30px;
-            font-size: 1.2rem;
+        .envelope-btn {
             background: var(--primary);
             color: white;
-            border: none;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            border: 2px solid var(--gold);
             border-radius: 50px;
-            margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(255, 77, 109, 0.4);
-        }
-        .btn-main:hover { transform: scale(1.05); background: #d63353; }
-
-        #password-section { display: none; margin-top: 20px; }
-        input[type="password"] {
-            padding: 10px;
-            border: 2px solid var(--secondary);
-            border-radius: 10px;
-            outline: none;
-            text-align: center;
-            font-size: 1rem;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(194, 30, 86, 0.3);
+            transition: transform 0.3s;
+            font-family: 'Dancing Script', cursive;
         }
 
-        /* Page 2 Specifics */
-        #page2 { background: #fff5f5; text-align: center; }
-        
-        .content-container {
-            max-width: 800px;
-            width: 100%;
-            margin-top: 20px;
+        .envelope-btn:hover {
+            transform: scale(1.1);
+            background: #a01342;
         }
 
-        /* Polaroid Frames */
-        .gallery {
+        /* --- Page 2: Memories & Film Strip --- */
+        .film-strip {
             display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-bottom: 40px;
+            background: #000;
+            padding: 10px 0;
+            overflow-x: auto;
+            width: 100%;
+            margin-bottom: 30px;
+            border-top: 5px dashed white;
+            border-bottom: 5px dashed white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .film-frame {
+            min-width: 200px;
+            height: 250px;
+            margin: 0 15px;
+            background: white;
+            padding: 10px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .film-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border: 1px solid #ddd;
+        }
+
+        .praise-box {
+            background: white;
+            border: 2px solid var(--gold);
+            padding: 20px;
+            margin: 20px 0;
+            max-width: 600px;
+            text-align: center;
+            border-radius: 15px;
+            position: relative;
+        }
+
+        .praise-box::before {
+            content: '❤️';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 20px;
+            background: var(--cream);
+            padding: 0 10px;
         }
 
         .polaroid {
             background: white;
-            padding: 10px 10px 40px 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
-            transform: rotate(-2deg);
-            transition: transform 0.3s ease;
-            width: 200px;
-            border: 1px solid #ddd;
+            padding: 15px 15px 40px 15px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            transform: rotate(-3deg);
+            max-width: 250px;
+            margin: 20px;
+            display: inline-block;
         }
-        .polaroid:nth-child(even) { transform: rotate(3deg); margin-top: 20px; }
-        .polaroid:hover { transform: scale(1.1) rotate(0deg); z-index: 10; }
-        .polaroid img { width: 100%; height: auto; border-radius: 2px; }
+        .polaroid:nth-child(even) { transform: rotate(3deg); }
+        .polaroid img { width: 100%; }
 
-        /* Text Boxes */
-        .love-letter {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            text-align: justify;
-            background: white;
+        /* --- Page 3: Quiz --- */
+        .quiz-container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            margin: 20px 0;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .question-box {
+            background: #fff;
             border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
-        /* Games */
-        .game-section {
-            background: #fff0f3;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 30px 0;
-            border: 2px dashed var(--primary);
-        }
-
-        .input-game input {
-            width: 80%;
-            padding: 12px;
-            margin: 10px 0;
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
+            font-family: 'Poppins', sans-serif;
+            background: #fffafa;
         }
 
-        /* Yes/No Game */
-        .yes-no-game { display: flex; flex-direction: column; gap: 15px; text-align: left; }
-        .question-row { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding: 10px 0; }
-        .options label { margin-left: 10px; font-weight: bold; color: var(--primary); cursor: pointer; }
+        /* Custom Slider */
+        input[type=range] {
+            width: 100%;
+            accent-color: var(--primary);
+        }
 
-        /* Page 3 Specifics */
-        #page3 { background: linear-gradient(135deg, #fff1eb 0%, #ace0f9 100%); }
-        
-        .gift-heart {
-            font-size: 100px;
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        /* --- Page 4: Heart & Message --- */
+        #heart-lock {
             cursor: pointer;
-            transition: transform 0.5s;
-            animation: bounce 2s infinite;
+            transition: transform 1s;
         }
-        .gift-heart:hover { transform: scale(1.1); }
+        
+        #heart-lock:hover {
+            transform: scale(1.1);
+        }
 
-        .sweet-box {
-            background: white;
-            padding: 15px;
-            margin: 10px 0;
+        .heart-shape {
+            position: relative;
+            width: 100px;
+            height: 90px;
+            background-color: var(--primary);
+            display: inline-block;
+            margin-top: 50px;
+        }
+        .heart-shape:before, .heart-shape:after {
+            position: absolute;
+            content: "";
+            left: 50px;
+            top: 0;
+            width: 50px;
+            height: 80px;
+            background-color: var(--primary);
+            border-radius: 50px 50px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .heart-shape:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        
+        .ribbon {
+            position: absolute;
+            top: 20px;
+            left: -10px;
+            width: 120px;
+            height: 20px;
+            background: var(--gold);
+            z-index: 10;
+        }
+
+        .message-drop {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .love-note {
+            background: linear-gradient(to right, #fff, #fff0f5);
+            border: 1px solid var(--gold);
+            padding: 20px;
+            margin: 15px 0;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            border-left: 5px solid #ffd700;
-            opacity: 0;
+            opacity: 0; 
             transform: translateY(-20px);
-            animation: dropIn 0.5s forwards;
+            animation: dropIn 0.8s forwards;
         }
 
-        /* Animations */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes heartbeat { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-20px);} 60% {transform: translateY(-10px);} }
-        @keyframes dropIn { to { opacity: 1; transform: translateY(0); } }
+        @keyframes dropIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .big-letter {
+            background: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            border: 2px solid var(--primary);
+            margin-top: 30px;
+            position: relative;
+            max-width: 800px;
+            box-shadow: 0 0 20px rgba(194, 30, 86, 0.2);
+        }
+
+        /* Buttons */
+        .btn-nav {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.3s;
+        }
+        .btn-nav:hover { background: #a01342; }
 
     </style>
 </head>
 <body>
 
-    <!-- PAGE 1: LOGIN -->
-    <div id="page1" class="section">
-        <div class="landing-box">
-            <div class="heart-icon">❤️</div>
-            <h1>For Anshu Didi, with Lots of Love</h1>
-            <p>A small digital world created just for you, by Akrit.</p>
-            <button class="btn-main" onclick="showPasswordInput()">Open Letter From Your Bro...</button>
-            
-            <div id="password-section">
-                <p>Enter Passcode:</p>
-                <input type="password" id="passcode" placeholder="Enter code here">
-                <br>
-                <button class="btn-main" style="background-color: var(--secondary); font-size: 1rem; padding: 10px 20px;" onclick="checkPassword()">Unlock</button>
-            </div>
-        </div>
-    </div>
+    <!-- PAGE 1: LANDING -->
+    <section id="page1" class="active">
+        <h1 style="font-size: 3rem; text-align: center;">For My Dearest Anshu Didi</h1>
+        <p style="font-size: 1.2rem; margin-bottom: 30px;">A small gift from your younger brother, Akrit.</p>
+        <button class="envelope-btn" onclick="openPasswordModal()">Open Letter 💌</button>
+    </section>
 
-    <!-- PAGE 2: CONTENT & GAMES -->
-    <div id="page2" class="section">
-        <div class="content-container">
-            <h2>To My Dearest Sister...</h2>
-            
-            <!-- PHOTOS -->
-            <div class="gallery">
-                <!-- Make sure these images exist in your folder -->
-                <div class="polaroid"><img src="images/photo1.jpg" alt="Didi Coat"></div>
-                <div class="polaroid"><img src="images/photo2.jpg" alt="Maths Club"></div>
-                <div class="polaroid"><img src="images/photo3.jpg" alt="Birthday"></div>
-            </div>
-
-            <!-- LETTER PART 1 -->
-            <div class="love-letter">
-                <p>
-                    My dearest Anshu Didi, <br><br>
-                    I am writing this because sometimes words aren't enough to express what a brother feels for his sister. You are soon going to be married and sent to your <strong> sasural </strong>, and while I am happy for your new life, my heart feels a little heavy. You aren't just a cousin to me; I have always wished we were "sage bhai behen" since childhood.
-                    <br><br>
-                    You are a Maths Gold Medalist, a lecturer, and so incredibly intelligent (while I’m still struggling with numbers!). But more than that, you are beautiful. You are 5'5", fair, and honestly, extremely beautiful—more than any Bollywood actress.
-                </p>
-            </div>
-
-           <!-- GAME 1: LOVE METER (Just for fun, doesn't save) -->
-            <div class="game-section">
-                <h3>😘 How much do you love Akrit? 😘</h3>
-                <p>Slide the bar!</p>
-                <input type="range" min="1" max="100" value="50" style="width:100%" oninput="document.getElementById('loveText').innerText = this.value > 80 ? 'Infinity Love! 😍' : 'More please! 🥺'">
-
-                <p id="loveText" style="font-weight: bold; color: var(--primary);">Drag it!</p>
-            </div>
-
-
-            <!-- LETTER PART 2 -->
-            <div class="love-letter">
-                <div style="float: right; margin: 0 0 15px 15px; width: 150px;" class="polaroid">
-                    <img src="images/photo4.jpg" alt="Beautiful Didi">
-                </div>
-                <p>
-                    I know you are working out to get slim, but honestly Didi? I loved your older version too—thick, chubby, cute, wearing those round spectacles. That look enhanced your beauty to an extreme level. 
-                    <br><br>
-                    You are still learning car driving, while I have mastered speeding (but don't tell anyone🤫). But that's just us. You’ve been tying me Rakhi and giving me chocolates since I was a kid. I want you to know: <strong>I love you with all my heart.</strong> I cannot imagine my life without talking to you.
-                </p>
-            </div>
-
-            <!-- GAME 2: TEXT QUESTIONS (Saves to Firebase) -->
-            <div class="game-section input-game">
-                <h3>Tell me about yourself...</h3>
-                <input type="text" id="ans_chocolate" placeholder="What is your favorite chocolate?">
-                <input type="text" id="ans_drive" placeholder="Would you like to go on a long drive with me?">
-                <input type="text" id="ans_memory" placeholder="Your favorite memory from college days?">
-            </div>
-
-            <!-- GAME 3: YES/NO (Saves to Firebase) -->
-            <div class="game-section yes-no-game">
-                <h3>The Truth Test 🤫</h3>
-                
-                <div class="question-row">
-                    <span>Did you ever use abusive language?</span>
-                    <div class="options">
-                        <label><input type="radio" name="q1" value="Yes"> Yes</label>
-                        <label><input type="radio" name="q1" value="No"> No</label>
-                    </div>
-                </div>
-
-                <div class="question-row">
-                    <span>Did you ever drink alcohol?</span>
-                    <div class="options">
-                        <label><input type="radio" name="q2" value="Yes"> Yes</label>
-                        <label><input type="radio" name="q2" value="No"> No</label>
-                    </div>
-                </div>
-
-                <div class="question-row">
-                    <span>Did you ever watch adult content?</span>
-                    <div class="options">
-                        <label><input type="radio" name="q3" value="Yes"> Yes</label>
-                        <label><input type="radio" name="q3" value="No"> No</label>
-                    </div>
-                </div>
-            </div>
-
-            <br>
-            <!-- THIS BUTTON TRIGGERS THE SAVE -->
-            <button class="btn-main" onclick="saveAndGoToPage3()">Enter into Akrit's heart... ❤️</button>
-            <br><br>
-        </div>
-    </div>
-
-    <!-- PAGE 3: FINAL QUESTION & SURPRISE -->
-    <!-- PAGE 3: SURPRISE & GOODBYE (Original Design restored) -->
-    <div id="page3" class="section">
-        <div class="content-container">
-            <p class="final-question" style="font-size: 1.5rem; font-weight: 600;">What do you like the most in your younger brother?</p>
-            
-            <!-- Added ID 'ans_brother' for Firebase -->
-            <textarea id="ans_brother" style="width: 100%; height: 100px; padding: 10px; border-radius: 10px; border: 2px solid var(--secondary);" placeholder="Write here..."></textarea>
-            
-            <button class="btn-main" style="font-size: 0.9rem; margin-top: 10px;" onclick="submitFinalAnswer()">Submit Answer</button>
-
-            <br><br><br>
-            <p>Scroll down for a surprise...</p>
-            <br>
-
-            <div style="margin: 50px 0; text-align: center;">
-                <!-- Original Ribbon Heart -->
-                <div class="gift-heart" onclick="openGift()">💖<span style="font-size: 40px; vertical-align: middle;">🎀</span></div>
-                <p style="font-size: 0.8rem;">(Click the heart!)</p>
-            </div>
-
-            <div class="msg-container" id="messages" style="display: none; width: 100%; max-width: 600px;">
-                <div class="sweet-box" style="animation-delay: 0.2s">You are literally the best sister in the world.</div>
-                <div class="sweet-box" style="animation-delay: 0.8s">I will miss your presence, scoldings and your love.</div>
-                <div class="sweet-box" style="animation-delay: 1.4s">You are a Math Genius but my Sweet Didi first.</div>
-                <div class="sweet-box" style="animation-delay: 2.0s">I promise to always be there for you.</div>
-                <div class="sweet-box" style="animation-delay: 2.6s">Your round specs look will always be legendary!</div>
-                <div class="sweet-box" style="animation-delay: 3.2s">I love you Didi, forever and always.</div>
-            </div>
-
-            <div class="closing-msg reveal" style="margin-top: 40px; font-family: 'Sacramento', cursive; font-size: 2rem; color: #d63353;">
-                "No matter how far you go, you'll always be close to my heart. <br>
-                I wish you good luck and happiness for the future.<br>
-                <strong>Khoob tarakki kro, khoob aage bdho, khoob bachhe kro!</strong><br>
-                I am always with you."
-            </div>
-
-            <br><br>
-            <button class="btn-main" style="background: #333;" onclick="closeSite()">Close this letter</button>
-        </div>
-    </div>
-    <!-- ============================================== -->
-    <!-- FIREBASE CONNECTION (YOUR SPECIFIC KEYS)       -->
-    <!-- ============================================== -->
-    <script type="module">
-        // 1. Import Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-database.js";
-
-        // 2. YOUR Configuration (From your screenshot)
-        const firebaseConfig = {
-            apiKey: "AIzaSyAsb82a0hkcdiLRGp0qJl8JyiN6_YSxk1Q",
-            authDomain: "anshudidi-68755.firebaseapp.com",
-            projectId: "anshudidi-68755",
-            storageBucket: "anshudidi-68755.firebasestorage.app",
-            messagingSenderId: "780281347305",
-            appId: "1:780281347305:web:1af5295333b36d3c748478"
-        };
-
-        // 3. Initialize
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-
-        // 4. Create Global Functions for the Buttons
+    <!-- PAGE 2: MEMORIES & PRAISE -->
+    <section id="page2">
+        <h2>Unwinding Memories...</h2>
         
-        // --- FUNCTION 1: Save Games and Go to Page 3 ---
-        window.saveAndGoToPage3 = function() {
-            // Get text inputs
-            const chocolate = document.getElementById('ans_chocolate').value;
-            const drive = document.getElementById('ans_drive').value;
-            const memory = document.getElementById('ans_memory').value;
+        <!-- Film Strip Animation -->
+        <div class="film-strip">
+            <!-- Add your images here (img1.jpg, img2.jpg, etc.) -->
+            <div class="film-frame"><img src="images/img1.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img2.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img3.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img4.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img5.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img9.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img11.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img12.jpg" alt="Memory"></div>
+            <div class="film-frame"><img src="images/img17.jpg" alt="Memory"></div>        
+        </div>
+
+        <div class="praise-box fade-in-scroll">
+            <h3>The Golden Girl</h3>
+            <p>From winning Gold Medals in B.Sc Maths to teaching students with passion. While I struggled with numbers, but mastered speeding(don't tell anyone).<br><strong> You are beauty with brains in the truest sense.</strong></p>
+        </div>
+
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+            <div class="polaroid fade-in-scroll">
+                <img src="images/img6.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">Lecturer Mode</p>
+            </div>
+            <div class="polaroid fade-in-scroll">
+                <img src="images/img7.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">Pure Beauty</p>
+            </div>
+            <div class="polaroid fade-in-scroll">
+                <img src="images/img8.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">True Queen</p>
+            </div>
+        </div>
+
+        <div class="praise-box fade-in-scroll">
+            <h3>Timeless Beauty</h3>
+            <p>You are <strong>extremely beautiful</strong>, more than any actress. I know you are working out now, but I loved that cute, thick version of you with those round specs! You have a kind and loving nature that makes you shine even brighter.</p>
+        </div>
+         <div style="display: flex; flex-wrap: wrap; justify-content: center;">        
+        <div class="polaroid fade-in-scroll">
+                <img src="images/img13.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">Your Style🤌🏻</p>
+            </div>
+        <div class="polaroid fade-in-scroll">
+                <img src="images/img16.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">Your Aura🔥</p>
+            </div>
+        </div>
+        <div class="praise-box fade-in-scroll">
+            <h3>My Sister, My Bestie</h3>
+            <p>Even though we are cousins, you are no less than my <strong>"Sagi Didi"</strong>. You've tied me Rakhi, given me chocolates, and loved me like your own since childhood. I will miss you so much when you go to your <strong>Sasural</strong>.</p>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; justify-content: center;">        
+        <div class="polaroid fade-in-scroll">
+                <img src="images/img10.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">Maths Maharani👸🏻</p>
+            </div>
+        <div class="polaroid fade-in-scroll">
+                <img src="images/img15.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">This Look😍</p>
+            </div>
+         <div class="polaroid fade-in-scroll">
+                <img src="images/img18.jpg" alt="Didi">
+                <p style="text-align: center; font-size: 0.8rem;">Your Beauty😍🔥</p>
+            </div>
+        </div>
+        <button class="btn-nav" onclick="goToPage(3)">Akrit had some questions to ask... Clear them before you go!</button>
+    </section>
+
+    <!-- PAGE 3: THE QUIZ -->
+    <section id="page3">
+        <h2>Fun & Truths</h2>
+        <p style="text-align: center; max-width: 600px;">
+            Didi, these are some fun, non-serious questions. If something feels too personal, you can skip, but answer all of them honestly! <br>
+            No "use bure na lge" or "baat leak hogi" fears. This is just between us.
+        </p>
+
+        <form id="quizForm" class="quiz-container">
+            <!-- Game 1: Love Meter -->
+            <div class="question-box">
+                <label>How much do you love your brother Akrit? (Drag the slider)</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                    <span>😐</span>
+                    <input type="range" name="love_level" min="0" max="100" value="50">
+                    <span style="font-size: 1.5rem;">😘</span>
+                </div>
+            </div>
+
+            <!-- Game 2: Text Questions -->
+            <div class="question-box"><label>1. Your fav chocolate?</label><input type="text" name="q1"></div>
+            <div class="question-box"><label>2. Would you like to go on a drive with me?</label><input type="text" name="q2"></div>
+            <div class="question-box"><label>3. Your fav memory of college days?</label><textarea name="q3"></textarea></div>
+            <div class="question-box"><label>4. If someone asked why I matter to you, what will you say?</label><textarea name="q4"></textarea></div>
+            <div class="question-box"><label>5. Why did you agree to marriage? Under pressure?</label><textarea name="q5"></textarea></div>
+            <div class="question-box"><label>6. What's your happiest memory of us?</label><textarea name="q6"></textarea></div>
+            <div class="question-box"><label>7. One thing that disturbed you most but never told anyone? Reveal it here, honestly.</label><textarea name="q7"></textarea></div>
+            <div class="question-box"><label>8. Small thing I do that makes you happier?</label><input type="text" name="q8"></div>
+            <div class="question-box"><label>9. How much do you trust me/comfortable with me?</label><input type="text" name="q9"></div>
+            <div class="question-box"><label>10. Which part of marriage scares you most? 😁</label><input type="text" name="q10"></div>
+            <div class="question-box"><label>11. Ever had a crush? Who/When? Poori kahani btao...</label><textarea name="q11"></textarea></div>
+
+            <!-- Game 3: Yes/No -->
+            <h3 style="text-align: center; margin-top: 30px; color: var(--gold);">Rapid Fire: Yes or No</h3>
             
-            // Get radio button inputs
-            const q1 = document.querySelector('input[name="q1"]:checked')?.value || "No Answer";
-            const q2 = document.querySelector('input[name="q2"]:checked')?.value || "No Answer";
-            const q3 = document.querySelector('input[name="q3"]:checked')?.value || "No Answer";
+            <div class="question-box">
+                <label>1. Ever used abusive language with friends?</label>
+                <div class="radio-group"><label><input type="radio" name="yn1" value="Yes"> Yes</label><label><input type="radio" name="yn1" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>2. Ever drinked?</label>
+                <div class="radio-group"><label><input type="radio" name="yn2" value="Yes"> Yes</label><label><input type="radio" name="yn2" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>3. Voluntarily or accidentally watched adult content?</label>
+                <div class="radio-group"><label><input type="radio" name="yn3" value="Yes"> Yes</label><label><input type="radio" name="yn3" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>4. Would you prefer dating over arranged marriage?</label>
+                <div class="radio-group"><label><input type="radio" name="yn4" value="Yes"> Yes</label><label><input type="radio" name="yn4" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>5. Will you prefer me over your husband for a long road trip?😅</label>
+                <div class="radio-group"><label><input type="radio" name="yn5" value="Yes"> Yes</label><label><input type="radio" name="yn5" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>6. Ever suffered average girl-life traumas(staring/comments)?</label>
+                <div class="radio-group"><label><input type="radio" name="yn6" value="Yes"> Yes</label><label><input type="radio" name="yn6" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>7. Kya aap ladko se jyada double meaning baatein kr leti ho?😝</label>
+                <div class="radio-group"><label><input type="radio" name="yn7" value="Yes"> Yes</label><label><input type="radio" name="yn7" value="No"> No</label></div>
+            </div>
+            <div class="question-box">
+                <label>8. Do you accept you are beautiful just cuz I am your brother?</label>
+                <div class="radio-group"><label><input type="radio" name="yn8" value="Yes"> Yes</label><label><input type="radio" name="yn8" value="No"> No</label></div>
+            </div>
 
-            console.log("Saving data..."); // Debugging
+        </form>
+        <button class="btn-nav" onclick="goToPage(4)">Enter into Akrit's message...</button>
+    </section>
 
-            // Save to Firebase
-            push(ref(db, 'DidiAnswers'), {
-                timestamp: new Date().toString(),
-                fav_chocolate: chocolate,
-                long_drive: drive,
-                fav_memory: memory,
-                abusive_lang: q1,
-                alcohol: q2,
-                adult_content: q3
-            })
-            .then(() => {
-                // Success: Switch pages
-                document.getElementById('page2').style.display = 'none';
-                document.getElementById('page3').style.display = 'flex';
-                window.scrollTo(0, 0);
-            })
-            .catch((error) => {
-                alert("Could not save answers (Internet issue?): " + error.message);
-                // Still switch pages so she doesn't get stuck
-                document.getElementById('page2').style.display = 'none';
-                document.getElementById('page3').style.display = 'flex';
-            });
-        };
+    <!-- PAGE 4: THE LETTER -->
+    <section id="page4">
+        <h2>One Last Thing...</h2>
+        <div class="question-box" style="width: 100%; max-width: 600px;">
+            <label>List one thing you like and hate most in your younger brother?</label>
+            <input type="text" id="finalQuestion">
+            <button class="btn-nav" id="finalSubmitBtn" onclick="submitToFirebase()" style="width: 100%; margin-top: 10px; background: var(--gold);">Submit Answers First</button>
+        </div>
 
-      // --- FUNCTION 2: Save Final Message ---
-        window.submitFinalAnswer = function() {
-            const broLove = document.getElementById('ans_brother').value;
+        <div id="page4-part2" style="display:none; width: 100%; text-align: center;">
+            <p style="margin-top: 30px;">Tap the heart to unwrap my love...</p>
+            
+            <div id="heart-lock" onclick="openHeart()">
+                <div class="heart-shape">
+                    <div class="ribbon"></div>
+                </div>
+            </div>
 
-            push(ref(db, 'DidiFinalMessage'), {
-                timestamp: new Date().toString(),
-                message_for_akrit: broLove
-            })
-            .then(() => {
-                alert("Answer sent to Akrit! Now click the heart below... ❤️");
-            })
-            .catch((error) => {
-                alert("Error sending: " + error.message);
-            });
-        };
+            <div id="final-message-container" class="message-drop">
+                <!-- Floating Love Notes -->
+                <div class="love-note" style="animation-delay: 0.2s;">You are my guiding star🌟</div>
+                <div class="love-note" style="animation-delay: 0.4s;">Thanks for always helping with Maths!➗</div>
+                <div class="love-note" style="animation-delay: 0.6s;">I love you more than words can say❤️</div>
+                <div class="love-note" style="animation-delay: 0.8s;">I'll always be your annoying little brother👦</div>
+                <div class="love-note" style="animation-delay: 1.0s;">You are the most beautiful bride-to-be, truly👰</div>
+                <div class="love-note" style="animation-delay: 1.2s;">I will miss our laughs😂</div>
+                <div class="love-note" style="animation-delay: 1.4s;">Sage Bhai-Behen forever in heart👫</div>
 
-        // --- FUNCTION 3: Open the Gift Animation (Visual only) ---
-        window.openGift = function() {
-            const container = document.getElementById('messages');
-            container.style.display = 'block';
-            container.scrollIntoView({ behavior: 'smooth' });
-        };
-        
-        // --- FUNCTION 4: Close Site (Visual only) ---
-        window.closeSite = function() {
-             document.body.innerHTML = '<div style="display:flex;justify-content:center;align-items:center;height:100vh;background:black;color:white;"><h1>Goodbye Didi! ❤️</h1></div>';
-        };
-    </script>
+                <!-- Main Letter -->
+                <div class="big-letter fade-in-scroll">
+                    <p>
+                        You are truly special and when I say special, I mean it in the deepest, most heartfelt way. With you, I find a comfort I've never known. Talking to you feels easy, sharing my thoughts feels safe. You listen without judgment, without limits. Around you, I don't fear being misunderstood; I can simply be myself. It took time for me to realize that you're not like the others. You care in ways words can't capture. You love me for who I am—no filters, no expectations. You have a heart so rare, so kind, it still amazes me. You're the one who stays up just to hear my silly talks, the one who sees through my smile, You notice the pain even when I hide it well.
+                    </p>
+                    <br>
+                    <p>
+                        I can never thank you enough for walking into my life and lighting it up with your love and patience. You've always said "I'll be there for you," and you've kept that promise every single time. You corrected me when I was wrong, stood by me when I was weak, and reminded me that I am loved and important. In a world full of people, you are my one person—only one I truly need. Stay with me forever, because life without you wouldn't be the same again. I love you endlessly, till the endd...
+                    </p>
+                </div>
 
-    <!-- GENERAL JAVASCRIPT (Password & Animation Logic) -->
+                <div class="love-note" style="background: var(--gold); color: white; margin-top: 30px;">
+                    No matter how far you go, you'll always be close to my <strong>heart</strong>. I wish you good luck and happiness for future, khoob <strong>tarakki</strong> kro, khoob aage bdho, khoob <strong>bachhe</strong> kro daba ke!! I am always with you.
+                </div>
+
+                <button class="btn-nav" onclick="closeSite()" style="background: #333; margin-top: 50px;">Close this letter</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript Logic -->
     <script>
-        // Password Show
-        function showPasswordInput() {
-            document.getElementById('password-section').style.display = 'block';
-        }
-
-        // Password Check
-        function checkPassword() {
-            const pass = document.getElementById('passcode').value;
-            if (pass === "ILUDIDI") {
-                document.getElementById('page1').style.display = 'none';
-                document.getElementById('page2').style.display = 'flex';
+        // Password Protection
+        function openPasswordModal() {
+            let pass = prompt("Enter the secret code for Didi:");
+            if (pass === "DidiBestie") {
+                goToPage(2);
             } else {
-                alert("Incorrect Passcode! Try again.");
+                alert("Wrong passcode! Only Anshu Didi knows it.");
             }
         }
 
-        // Show final messages
-        function showMessages() {
-            document.getElementById('messages-container').style.display = 'block';
-            document.getElementById('messages-container').scrollIntoView({ behavior: 'smooth' });
+        // Navigation
+        function goToPage(pageNum) {
+            document.querySelectorAll('section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById('page' + pageNum).classList.add('active');
+            window.scrollTo(0,0);
         }
-    </script>
-</body>
 
+        // Heart Animation
+        function openHeart() {
+            document.getElementById('heart-lock').style.transform = "scale(0) rotate(360deg)";
+            document.getElementById('heart-lock').style.opacity = "0";
+            setTimeout(() => {
+                document.getElementById('heart-lock').style.display = "none";
+                document.getElementById('final-message-container').style.display = "block";
+            }, 500);
+        }
+
+        // Close Site
+        function closeSite() {
+            alert("Love you Didi! Bye! 👋");
+            window.close(); // Note: This only works if script opened the window.
+            document.body.innerHTML = "<h1 style='text-align:center; margin-top:20%'>See you soon Didi! ❤️</h1>";
+        }
+
+        // Scroll Animation Observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        // Observe elements
+        document.querySelectorAll('.fade-in-scroll').forEach(el => observer.observe(el));
+    </script>
+
+</body>
 </html>
