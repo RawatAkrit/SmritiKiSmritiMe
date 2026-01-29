@@ -25,36 +25,40 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        window.submitToFirebase = async function() {
-            const answers = {};
-            
-            // Collect Form Data
-            const formData = new FormData(document.getElementById('quizForm'));
-            for (let [key, value] of formData.entries()) {
-                answers[key] = value;
-            }
+       window.submitToFirebase = async function () {
+    const answers = {};
 
-            // Get the specific final question from Page 4
-            const finalQ = document.getElementById('finalQuestion').value;
-            answers['like_hate_brother'] = finalQ;
-            answers['timestamp'] = serverTimestamp();
+    // Collect Form Data
+    const form = document.getElementById('quizForm');
+    const formData = new FormData(form);
 
-            try {
-                const btn = document.getElementById('finalSubmitBtn');
-                btn.innerText = "Sending Love...";
-                await addDoc(collection(db, "anshu_didi_answers"), answers);
-                btn.innerText = "Sent! ❤️";
-                alert("Your answers have reached Akrit!");
-                
-                // Reveal the heart section
-                document.getElementById('final-message-container').scrollIntoView({ behavior: 'smooth' });
-                document.getElementById('page4-part2').style.display = 'block';
-                
-            } catch (e) {
-                console.error("Error adding document: ", e);
-                alert("Error sending answers. Check internet connection.");
-            }
-        }
+    for (let [key, value] of formData.entries()) {
+        answers[key] = value;
+    }
+
+    answers['timestamp'] = serverTimestamp();
+
+    try {
+        const btn = document.getElementById('finalSubmitBtn');
+        btn.innerText = "Sending Love...";
+        btn.disabled = true;
+
+        await addDoc(collection(db, "anshu_didi_answers"), answers);
+
+        btn.innerText = "Sent! ❤️";
+        alert("Your answers have reached Akrit!");
+
+        // Reveal heart section
+        document.getElementById('page4-part2').style.display = 'block';
+        document.getElementById('page4-part2')
+            .scrollIntoView({ behavior: 'smooth' });
+
+    } catch (e) {
+        console.error("Firebase Error:", e);
+        alert("Error sending answers. Please check internet.");
+        document.getElementById('finalSubmitBtn').disabled = false;
+    }
+}
     </script>
 
     <style>
@@ -494,8 +498,12 @@
 
     <!-- PAGE 4: THE LETTER -->
     <section id="page4">
-       
-
+       <button class="btn-nav" id="finalSubmitBtn"
+    onclick="submitToFirebase()"
+    style="width: 100%; max-width: 600px; background: var(--gold);">
+    Submit Answers & Open My Letter ❤️
+</button>
+        
         <div id="page4-part2" style="display:none; width: 100%; text-align: center;">
             <p style="margin-top: 30px;">Tap the heart to unwrap my love...</p>
             
@@ -586,4 +594,5 @@
 
 </body>
 </html>
+
 
