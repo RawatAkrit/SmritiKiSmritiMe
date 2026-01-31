@@ -8,57 +8,62 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     
-    <!-- Firebase SDKs -->
+    <!-- Firebase SDKs for Realtime Database -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+        // Changed to Realtime Database SDKs
+        import { getDatabase, ref, push, set, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
 
+        // Your New Configuration
         const firebaseConfig = {
-            apiKey: "AIzaSyCTJrlLbzSRPpsOt2JFP40pieuuHkzzd0s",
-            authDomain: "smritikismritime.firebaseapp.com",
-            projectId: "smritikismritime",
-            storageBucket: "smritikismritime.firebasestorage.app",
-            messagingSenderId: "464815274632",
-            appId: "1:464815274632:web:d1cf13efc758bfe2ba3d3d"
+            apiKey: "AIzaSyAMebWH9Li2jJ8dCNpgynCjaB-LPpkCO-Y",
+            authDomain: "anshudidi.firebaseapp.com",
+            databaseURL: "https://anshudidi-default-rtdb.firebaseio.com",
+            projectId: "anshudidi",
+            storageBucket: "anshudidi.firebasestorage.app",
+            messagingSenderId: "83972158901",
+            appId: "1:83972158901:web:8b3dac8f186ff1d3ffd5fc"
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = getDatabase(app);
 
-       window.submitToFirebase = async function () {
-    const answers = {};
+        window.submitToFirebase = async function() {
+            const btn = document.getElementById('finalSubmitBtn');
+            const answers = {};
+            
+            // Collect Form Data
+            const formData = new FormData(document.getElementById('quizForm'));
+            for (let [key, value] of formData.entries()) {
+                answers[key] = value;
+            }
 
-    // Collect Form Data
-    const form = document.getElementById('quizForm');
-    const formData = new FormData(form);
+            // Get the specific final question from Page 4
+            const finalQ = document.getElementById('finalQuestion').value;
+            answers['like_hate_brother'] = finalQ;
+            answers['timestamp'] = serverTimestamp();
 
-    for (let [key, value] of formData.entries()) {
-        answers[key] = value;
-    }
+            try {
+                btn.innerText = "Sending Love...";
+                
+                // Realtime Database Logic: Create a reference and Push a new entry
+                const answersRef = ref(db, 'anshu_didi_answers');
+                const newAnswerRef = push(answersRef);
+                await set(newAnswerRef, answers);
 
-    answers['timestamp'] = serverTimestamp();
-
-    try {
-        const btn = document.getElementById('finalSubmitBtn');
-        btn.innerText = "Sending Love...";
-        btn.disabled = true;
-
-        await addDoc(collection(db, "anshu_didi_answers"), answers);
-
-        btn.innerText = "Sent! ❤️";
-        alert("Your answers have reached Akrit!");
-
-        // Reveal heart section
-        document.getElementById('page4-part2').style.display = 'block';
-        document.getElementById('page4-part2')
-            .scrollIntoView({ behavior: 'smooth' });
-
-    } catch (e) {
-        console.error("Firebase Error:", e);
-        alert("Error sending answers. Please check internet.");
-        document.getElementById('finalSubmitBtn').disabled = false;
-    }
-}
+                btn.innerText = "Sent! ❤️";
+                alert("Your answers have reached Akrit!");
+                
+                // Reveal the heart section
+                document.getElementById('final-message-container').scrollIntoView({ behavior: 'smooth' });
+                document.getElementById('page4-part2').style.display = 'block';
+                
+            } catch (e) {
+                console.error("Error adding document: ", e);
+                btn.innerText = "Error (Try Again)";
+                alert("Error sending answers. Please check your internet or Firebase Rules.");
+            }
+        }
     </script>
 
     <style>
@@ -357,7 +362,7 @@
         
         <!-- Film Strip Animation -->
         <div class="film-strip">
-            <!-- Add your images here (img1.jpg, img2.jpg, etc.) -->
+            <!-- Updated images path as provided -->
             <div class="film-frame"><img src="images/img1.jpg" alt="Memory"></div>
             <div class="film-frame"><img src="images/img2.jpg" alt="Memory"></div>
             <div class="film-frame"><img src="images/img3.jpg" alt="Memory"></div>
@@ -498,12 +503,13 @@
 
     <!-- PAGE 4: THE LETTER -->
     <section id="page4">
-       <button class="btn-nav" id="finalSubmitBtn"
-    onclick="submitToFirebase()"
-    style="width: 100%; max-width: 600px; background: var(--gold);">
-    Submit Answers & Open My Letter ❤️
-</button>
-        
+        <h2>One Last Thing...</h2>
+        <div class="question-box" style="width: 100%; max-width: 600px;">
+            <label>List one thing you like and hate most in your younger brother?</label>
+            <input type="text" id="finalQuestion">
+            <button class="btn-nav" id="finalSubmitBtn" onclick="submitToFirebase()" style="width: 100%; margin-top: 10px; background: var(--gold);">Submit Answers First</button>
+        </div>
+
         <div id="page4-part2" style="display:none; width: 100%; text-align: center;">
             <p style="margin-top: 30px;">Tap the heart to unwrap my love...</p>
             
@@ -594,5 +600,3 @@
 
 </body>
 </html>
-
-
